@@ -1,0 +1,54 @@
+package com.krakedev.inventarios.bdd;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+
+import com.krakedev.inventarios.entidades.Proveedores;
+import com.krakedev.inventarios.excepciones.KrakeException;
+import com.krakedev.inventarios.utils.ConexionBDD;
+
+public class ProveedoresBDD {
+	public ArrayList<Proveedores>buscar(String subcadena) throws KrakeException{
+		ArrayList<Proveedores> proveedor = new ArrayList<Proveedores>();
+		Connection con= null;
+		PreparedStatement ps= null;
+		ResultSet rs = null;
+		Proveedores proveedores = null;
+		
+		try {
+			con= ConexionBDD.obtenerConexion();
+			ps= con.prepareStatement("select identificador, tipo_de_documento, nombre , telefono, correo, direccion"
+					+ " from proveedores"
+					+ " where upper(nombre) like ?");
+			
+			ps.setString(1, "%"+subcadena.toUpperCase()+"%");
+			System.out.println(ps);
+			rs=ps.executeQuery();
+			
+			while(rs.next()) {
+				String identificador= rs.getString("Identificador");
+				String tipo_de_documento= rs.getString("tipo_de_documento");
+				String nombre= rs.getString("nombre");
+				String telefono= rs.getString("telefono");
+				String correo= rs.getString("correo");
+				String direccion= rs.getString("direccion");
+				proveedores= new Proveedores(identificador,tipo_de_documento,nombre,telefono,correo );
+				
+				proveedor.add(proveedores);
+			}
+			
+		}catch (KrakeException e) {
+			e.printStackTrace();
+			throw e;
+		}catch (SQLException e) {
+			e.printStackTrace();
+			throw new KrakeException("error al consutar. detalle" + e.getMessage());
+		}
+		
+		return proveedor;
+	}
+
+}

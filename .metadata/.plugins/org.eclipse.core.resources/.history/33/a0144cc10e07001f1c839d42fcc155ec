@@ -1,0 +1,89 @@
+package com.krakedev.inventarios.bdd;
+
+import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+
+import com.krakedev.inventarios.entidades.Categoria;
+import com.krakedev.inventarios.entidades.Producto;
+import com.krakedev.inventarios.entidades.Proveedores;
+import com.krakedev.inventarios.entidades.TipoDocumentos;
+import com.krakedev.inventarios.entidades.UnidadDeMedida;
+import com.krakedev.inventarios.excepciones.KrakeException;
+import com.krakedev.inventarios.utils.ConexionBDD;
+
+public class ProductoBDD {
+	
+	public ArrayList<Producto>buscar(String subcadena) throws KrakeException{
+		ArrayList<Producto> productos = new ArrayList<Producto>();
+		Connection con= null;
+		PreparedStatement ps= null;
+		ResultSet rs = null;
+		Producto producto = null;
+		
+		try {
+			con= ConexionBDD.obtenerConexion();
+			ps= con.prepareStatement("select pro.codigo_pro, pro.nombre as nombre_producto, udm.codigo_udm,udm.descripcion as descripcion_udm,"
+					+ " pro.precio_venta,pro.tiene_iva,pro.coste, pro.categoria,cat.nombre as nombre_categoria, pro.stock"
+					+ " from producto pro,  unidades_de_medida udm,  categorias cat "
+					+ " where pro.udm = udm.codigo_udm "
+					+ " and pro.categoria = cat.codigo_cat "
+					+ " and upper (pro.nombre) like ?");
+			
+			ps.setString(1, "%"+subcadena.toUpperCase()+"%");
+			System.out.println(ps);
+			rs=ps.executeQuery();
+			
+			while(rs.next()) {
+				int codigoProducto= rs.getInt("codigo_pro");
+				String nombreProducto= rs.getString("nombre_producto");
+				String codigoUdm= rs.getString("codigo_udm");
+				String descripcionUdm= rs.getString("descripcion_udm");
+				BigDecimal precioVenta= rs.getBigDecimal("precio_venta");
+				boolean tieneIva= rs.getBoolean("tiene_iva")
+				BigDecimal coste= rs.getBigDecimal("coste");
+				int  categoria= rs.getInt("categoria");
+				String nombreCategoria= rs.getString("nombre_categoria");
+				int  stock= rs.getInt("stock");
+				
+				UnidadDeMedida udm= new UnidadDeMedida();
+				udm.setCodigo(codigoUdm);
+				udm.setDescripcion(descripcionUdm);
+				
+				Categoria ca = new Categoria();
+				ca.setCodigo(categoria);
+				ca.setNombre(nombreCategoria);
+				
+				producto = new Producto();
+				producto.setCodigo(codigoProducto);
+				producto.setNombre(nombreProducto);
+				producto.setUnidadMedida(udm);
+				producto.setPrecio(precioVenta);
+				producto.setTieneIva(tieneIva);
+				producto.setCoste(coste);
+				producto.setCategoria(ca);
+				producto.setStock(stock);
+				
+				productos.add(producto);
+				
+				
+				
+				
+				
+			}
+			
+		}catch (KrakeException e) {
+			e.printStackTrace();
+			throw e;
+		}catch (SQLException e) {
+			e.printStackTrace();
+			throw new KrakeException("error al consutar. detalle" + e.getMessage());
+		}
+		
+		return productos;
+	}
+
+}
