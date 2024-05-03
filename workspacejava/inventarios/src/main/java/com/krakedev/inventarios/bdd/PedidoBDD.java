@@ -80,4 +80,62 @@ public void insertar(Pedido pedido) throws KrakeException{
 	}
 
 
+/////////////////////////// recibir o actualizar //////////////////////////////////////////////
+
+
+
+public void recibir(Pedido pedido) throws KrakeException{
+	
+	Connection con= null;
+	PreparedStatement ps= null;
+	PreparedStatement psDet= null;
+
+
+	
+	try {
+		con= ConexionBDD.obtenerConexion();
+		ps= con.prepareStatement("update cabecera_pedido set estado = 'R' where numero= ? "); 
+		
+		
+		ps.setInt(1, pedido.getNumero());
+		
+		ps.executeUpdate();
+		
+		
+		
+		ArrayList<DetallePedido> detallesPedido = pedido.getDetalle();
+		DetallePedido det;
+		for(int i=0; i<detallesPedido.size();i++) {
+			det= detallesPedido.get(i);
+			psDet= con.prepareStatement("update detalle_pedido set cantidad_recibida= ? ,subtotal= ? "
+					+ "where codigo= ? ");
+			
+			psDet.setInt(1, det.getCantidadRecibida());
+			
+			BigDecimal precioventa =det.getProducto().getPrecio();
+			BigDecimal cantidad= new BigDecimal(det.getCantidadRecibida());
+			
+			BigDecimal subtotal=precioventa.multiply(cantidad);
+			
+			psDet.setBigDecimal(2, subtotal);
+			
+			psDet.setInt(3, det.getCodigo());
+			
+			psDet.executeUpdate();
+			
+		}
+
+		
+	}catch (KrakeException e) {
+		e.printStackTrace();
+		throw e;
+	}catch (SQLException e) {
+		e.printStackTrace();
+		throw new KrakeException("error al recibir un pedido" + e.getMessage());
+	}
+	
+	
+}
+
+
 }
