@@ -2,6 +2,7 @@
 <section name="Workbench">
 	<section name="MavenProjectImportWizardPage">
 		<list key="rootDirectory">
+			<item value="C:\Users\Usuario\Desktop\programacion\inventario_m3\workspacejava\inventarios"/>
 		</list>
 		<list key="projectNameTemplate">
 			<item value="[artifactId]"/>
