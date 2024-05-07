@@ -6,11 +6,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 
 import com.krakedev.inventarios.entidades.DetallePedido;
 import com.krakedev.inventarios.entidades.Pedido;
+import com.krakedev.inventarios.entidades.historialStock;
 import com.krakedev.inventarios.excepciones.KrakeException;
 import com.krakedev.inventarios.utils.ConexionBDD;
 
@@ -89,6 +91,10 @@ public void recibir(Pedido pedido) throws KrakeException{
 	Connection con= null;
 	PreparedStatement ps= null;
 	PreparedStatement psDet= null;
+	PreparedStatement pshist= null;
+	
+	Date fechaActual= new Date();
+	Timestamp fechaHoraActual= new Timestamp(fechaActual.getTime());
 
 
 	
@@ -121,9 +127,22 @@ public void recibir(Pedido pedido) throws KrakeException{
 			
 			psDet.setInt(3, det.getCodigo());
 			
-			psDet.executeUpdate();
+			
+			
+			
+
+		pshist= con.prepareStatement("insert into historial_stock(fecha, referencia, producto, cantidad) "
+					+ "values(?,?,?,?);");
+		pshist.setTimestamp(1, fechaHoraActual);
+		pshist.setString(2, "pedido" + pedido.getNumero() );
+		pshist.setInt(3, det.getProducto().getCodigo());
+		pshist.setInt(4, det.getCantidadRecibida());
+		
+		pshist.executeUpdate();
 			
 		}
+		
+		
 
 		
 	}catch (KrakeException e) {
