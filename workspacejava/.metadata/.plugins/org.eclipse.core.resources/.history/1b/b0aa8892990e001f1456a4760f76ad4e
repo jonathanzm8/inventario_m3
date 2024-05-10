@@ -17,14 +17,14 @@ public class CabeceraVentas {
 	}
 
 	public CabeceraVentas(int codigo, Date fecha, BigDecimal totalSinIva, BigDecimal iva, BigDecimal total,
-			ArrayList<DetalleVentas> detalle) {
+			ArrayList<DetalleVentas> detallesVentas) {
 		super();
 		this.codigo = codigo;
 		this.fecha = fecha;
 		this.totalSinIva = totalSinIva;
 		this.iva = iva;
 		this.total = total;
-		this.detalle = detalle;
+		this.detallesVentas = detallesVentas;
 	}
 
 	public int getCodigo() {
@@ -67,21 +67,20 @@ public class CabeceraVentas {
 		this.total = total;
 	}
 
-	public ArrayList<DetalleVentas> getDetalle() {
-		return detalle;
+	public ArrayList<DetalleVentas> getDetallesVentas() {
+		return detallesVentas;
 	}
 
-	public void setDetalle(ArrayList<DetalleVentas> detalle) {
-		this.detalle = detalle;
+	public void setDetallesVentas(ArrayList<DetalleVentas> detallesVentas) {
+		this.detallesVentas = detallesVentas;
 	}
 
 	@Override
 	public String toString() {
 		return "CabeceraVentas [codigo=" + codigo + ", fecha=" + fecha + ", totalSinIva=" + totalSinIva + ", iva=" + iva
-				+ ", total=" + total + ", detalle=" + detalle + "]";
+				+ ", total=" + total + ", detallesVentas=" + detallesVentas + "]";
 	}
 
-	
 	
 
 }

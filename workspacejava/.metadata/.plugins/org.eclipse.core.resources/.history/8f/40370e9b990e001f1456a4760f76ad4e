@@ -56,7 +56,7 @@ public void crear(CabeceraVentas venta) throws KrakeException {
 			//*********//
 			
 		//DETALLES VENTAS & HISTORIAL STOCK
-			detallesVentas = venta.getDetalle();
+			detallesVentas = venta.getDetallesVentas();
 			
 			for(int i = 0; i < detallesVentas.size(); i++) {
 				DetalleVentas detalleX = detallesVentas.get(i);
