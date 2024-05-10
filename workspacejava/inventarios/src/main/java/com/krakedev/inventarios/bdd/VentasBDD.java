@@ -56,7 +56,7 @@ public void crear(CabeceraVentas venta) throws KrakeException {
 			//*********//
 			
 		//DETALLES VENTAS & HISTORIAL STOCK
-			detallesVentas = venta.getDetalle();
+			detallesVentas = venta.getDetallesVentas();
 			
 			for(int i = 0; i < detallesVentas.size(); i++) {
 				DetalleVentas detalleX = detallesVentas.get(i);
@@ -102,7 +102,7 @@ public void crear(CabeceraVentas venta) throws KrakeException {
 				
 			}
 		//ACTUALIZAR CABECERA
-			psVentaUpdate = con.prepareStatement("update cabecera_venta "
+			psVentaUpdate = con.prepareStatement("update cabecera_ventas "
 					+ "set total_sin_iva = ? , iva = ? , total = ? where codigo = ? ");
 			psVentaUpdate.setBigDecimal(1, sumaTotalSinIva);
 			psVentaUpdate.setBigDecimal(2, sumaIva);

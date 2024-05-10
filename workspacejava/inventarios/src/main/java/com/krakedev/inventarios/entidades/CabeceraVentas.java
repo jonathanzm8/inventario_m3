@@ -7,25 +7,24 @@ import java.util.ArrayList;
 public class CabeceraVentas {
 	private int codigo;
 	private Date fecha;
-	private BigDecimal TotalSinIva;
-	private BigDecimal Iva;
-	private BigDecimal total;
-	
-	private ArrayList<DetalleVentas> detalle;
+	private BigDecimal totalSinIva = BigDecimal.ZERO;
+	private BigDecimal iva = BigDecimal.ZERO;
+	private BigDecimal total = BigDecimal.ZERO;
+	private ArrayList<DetalleVentas> detallesVentas;
 	
 	public CabeceraVentas() {
 		
 	}
 
 	public CabeceraVentas(int codigo, Date fecha, BigDecimal totalSinIva, BigDecimal iva, BigDecimal total,
-			ArrayList<DetalleVentas> detalle) {
+			ArrayList<DetalleVentas> detallesVentas) {
 		super();
 		this.codigo = codigo;
 		this.fecha = fecha;
-		TotalSinIva = totalSinIva;
-		Iva = iva;
+		this.totalSinIva = totalSinIva;
+		this.iva = iva;
 		this.total = total;
-		this.detalle = detalle;
+		this.detallesVentas = detallesVentas;
 	}
 
 	public int getCodigo() {
@@ -45,19 +44,19 @@ public class CabeceraVentas {
 	}
 
 	public BigDecimal getTotalSinIva() {
-		return TotalSinIva;
+		return totalSinIva;
 	}
 
 	public void setTotalSinIva(BigDecimal totalSinIva) {
-		TotalSinIva = totalSinIva;
+		this.totalSinIva = totalSinIva;
 	}
 
 	public BigDecimal getIva() {
-		return Iva;
+		return iva;
 	}
 
 	public void setIva(BigDecimal iva) {
-		Iva = iva;
+		this.iva = iva;
 	}
 
 	public BigDecimal getTotal() {
@@ -68,22 +67,19 @@ public class CabeceraVentas {
 		this.total = total;
 	}
 
-	public ArrayList<DetalleVentas> getDetalle() {
-		return detalle;
+	public ArrayList<DetalleVentas> getDetallesVentas() {
+		return detallesVentas;
 	}
 
-	public void setDetalle(ArrayList<DetalleVentas> detalle) {
-		this.detalle = detalle;
+	public void setDetallesVentas(ArrayList<DetalleVentas> detallesVentas) {
+		this.detallesVentas = detallesVentas;
 	}
 
 	@Override
 	public String toString() {
-		return "CabeceraVentas [codigo=" + codigo + ", fecha=" + fecha + ", TotalSinIva=" + TotalSinIva + ", Iva=" + Iva
-				+ ", total=" + total + ", detalle=" + detalle + "]";
+		return "CabeceraVentas [codigo=" + codigo + ", fecha=" + fecha + ", totalSinIva=" + totalSinIva + ", iva=" + iva
+				+ ", total=" + total + ", detallesVentas=" + detallesVentas + "]";
 	}
-	
-	
-	
 
 	
 
