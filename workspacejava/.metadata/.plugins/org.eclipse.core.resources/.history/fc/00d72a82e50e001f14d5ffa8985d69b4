@@ -1,0 +1,93 @@
+package com.krakedev.inventarios.bdd;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+import com.krakedev.inventarios.entidades.Categoria;
+import com.krakedev.inventarios.entidades.Producto;
+import com.krakedev.inventarios.excepciones.KrakeException;
+import com.krakedev.inventarios.utils.ConexionBDD;
+
+public class ServiciosVariosBDD {
+	
+	public void actualizarProducto(Producto producto) throws KrakeException {
+		Connection con = null;
+		PreparedStatement ps = null;
+
+		try {
+			con = ConexionBDD.obtenerConexion();
+			ps = con.prepareStatement("Update producto set nombre = ?, udm = ?, precio_venta = ?, tiene_iva = ?, coste = ?, categoria = ? , stock = ? "
+					+ "where codigo_pro = ?");
+
+			ps.setString(1, producto.getNombre());
+			ps.setString(2, producto.getUnidadMedida().getCodigo());
+			ps.setBigDecimal(3, producto.getPrecio());
+			ps.setBoolean(4, producto.isTieneIva());
+			ps.setBigDecimal(5, producto.getCoste());
+			ps.setInt(6, producto.getCategoria().getCodigo());
+			ps.setInt(7, producto.getStock());
+			ps.setInt(8, producto.getCodigo());
+			
+			ps.executeUpdate();
+			
+			System.out.println();
+		} catch (KrakeException e) {
+			e.printStackTrace();
+			throw e;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KrakeException("Error al Actualizar producto. Detalle: " + e.getMessage());
+		}
+	}
+	
+	
+	public void crearCategoria(Categoria categoria) throws KrakeException {
+		Connection con = null;
+		PreparedStatement ps = null;
+
+		try {
+			con = ConexionBDD.obtenerConexion();
+			ps = con.prepareStatement("insert into categorias(nombre, categoria_padre) "
+					+ " values(?, ?);");
+
+			ps.setString(1, categoria.getNombre());
+			ps.setInt(2, categoria.getCategoriaPadre().getCodigo());
+
+			ps.executeUpdate();
+
+		} catch (KrakeException e) {
+			e.printStackTrace();
+			throw e;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KrakeException("Error al insertar Categoria. Detalle: " + e.getMessage());
+		}
+	}
+	
+	// actualizar categoria
+	
+	public void actualizar(Categoria categoria) throws KrakeDException {
+		Connection con = null;
+		PreparedStatement ps = null;
+
+		try {
+			con = ConexionBDD.obtenerConexion();
+			ps = con.prepareStatement("Update categorias set nombre = ?, categoria_padre = ? where codigo_cat = ?");
+
+			ps.setString(1, categoria.getNombre());
+			ps.setInt(2, categoria.getCategoriaPadre().getCodigo());
+			ps.setInt(3, categoria.getCodigo());
+
+			ps.executeUpdate();
+
+		} catch (KrakeException e) {
+			e.printStackTrace();
+			throw e;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KrakeException("Error al Actualizar Categoria. Detalle: " + e.getMessage());
+		}
+	}
+
+}
