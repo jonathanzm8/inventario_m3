@@ -1,0 +1,47 @@
+package com.krakedev.inventarios.bdd;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.Date;
+
+import com.krakedev.inventarios.entidades.Producto;
+import com.krakedev.inventarios.excepciones.KrakeException;
+import com.krakedev.inventarios.utils.ConexionBDD;
+
+public class VentasBDD {
+	
+public void crear(Producto producto) throws KrakeException{
+		
+		Connection con= null;
+		PreparedStatement ps= null;
+		
+		Date fechaActual = new Date();
+		java.sql.Date fechaSQL = new java.sql.Date(fechaActual.getTime());
+	
+		
+		try {
+			con= ConexionBDD.obtenerConexion();
+			ps= con.prepareStatement("insert into cabecera_ventas(fecha, total_sin_iva, iva, total) "
+					+ "values(?,0,0,0);");
+			
+			ps.setDate(1, fechaSQL);
+		
+			ps.executeUpdate();
+			
+	
+			
+		}catch (KrakeException e) {
+			e.printStackTrace();
+			throw e;
+		}catch (SQLException e) {
+			e.printStackTrace();
+			throw new KrakeException("error al ingresar un proveedor" + e.getMessage());
+		}
+		
+		
+	}
+
+}
+
+}

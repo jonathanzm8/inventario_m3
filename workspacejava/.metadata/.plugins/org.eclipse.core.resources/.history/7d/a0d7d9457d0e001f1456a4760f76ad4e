@@ -1,0 +1,125 @@
+package com.krakedev.inventarios.bdd;
+
+import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Date;
+
+import com.krakedev.inventarios.entidades.DetalleVentas;
+import com.krakedev.inventarios.entidades.cabeceraVentas;
+import com.krakedev.inventarios.excepciones.KrakeException;
+import com.krakedev.inventarios.utils.ConexionBDD;
+
+public class VentasBDD {
+
+	public void crear(cabeceraVentas ventas) throws KrakeException {
+
+		Connection con = null;
+		PreparedStatement ps = null;
+		PreparedStatement psDet = null;
+		PreparedStatement psActualizar = null;
+		PreparedStatement psHis = null;
+
+		ResultSet rsClave = null;
+		int codigocabecera = 0;
+		Date fechaActual = new Date();
+		java.sql.Date fechaSQL = new java.sql.Date(fechaActual.getTime());
+		Timestamp fechaHoraActual = new Timestamp(fechaActual.getTime());
+
+		try {
+			con = ConexionBDD.obtenerConexion();
+			ps = con.prepareStatement(
+					"insert into cabecera_ventas(fecha, total_sin_iva, iva, total) " + "values(?,0,0,0);");
+
+			ps.setDate(1, fechaSQL);
+
+			ps.executeUpdate();
+
+			rsClave = ps.getGeneratedKeys();
+			if (rsClave.next()) {
+				codigocabecera = rsClave.getInt(1);
+			}
+
+			ArrayList<DetalleVentas> detallesventas = ventas.getDetalles();
+			DetalleVentas detventas;
+			for (int i = 0; i < detallesventas.size(); i++) {
+				detventas = detallesventas.get(i);
+				psDet = con.prepareStatement(
+						"insert into detalle_de_ventas(cabecera_ventas, producto, cantidad, precio_venta, subtotal, subtatal_con_iva) "
+								+ "values(?,?,?,?,?,?);");
+
+				psDet.setInt(1, codigocabecera);
+				psDet.setInt(1, detventas.getProducto().getCodigo());
+				psDet.setInt(3, detventas.getCantidad());
+				psDet.setBigDecimal(4, detventas.getPrecioVenta());
+
+				BigDecimal cantidad = new BigDecimal(detventas.getCantidad());
+
+				BigDecimal subtotal = detventas.getProducto().getPrecio().multiply(cantidad);
+
+				psDet.setBigDecimal(5, subtotal);
+				detallesventas.get(i).setSubtotal(subtotal);
+
+				if (detventas.getProducto().isTieneIva()) {
+					BigDecimal iva = new BigDecimal(1.12);
+					BigDecimal subtotalIva = subtotal.multiply(iva);
+					psDet.setBigDecimal(6, subtotalIva);
+					detallesventas.get(i).setSubtotalConIva(subtotalIva);
+
+				} else {
+					psDet.setBigDecimal(6, subtotal);
+
+				}
+
+				psDet.executeUpdate();
+
+			}
+
+			BigDecimal totalSinIva = BigDecimal.ZERO;
+			BigDecimal iva = BigDecimal.ZERO;
+			for (int i = 0; i < detallesventas.size(); i++) {
+				detventas = detallesventas.get(i);
+				if (detventas.getSubtotal() != null) {
+					if (detventas.getProducto().isTieneIva()) {
+						totalSinIva = totalSinIva.add(detventas.getSubtotal());
+						iva = iva.add(detventas.getSubtotal().multiply(BigDecimal.valueOf(0.12)));
+					} else {
+						totalSinIva = totalSinIva.add(detventas.getSubtotal());
+					}
+				}
+				BigDecimal total = totalSinIva.add(iva);
+				psActualizar = con.prepareStatement(
+						"Update cabecera_ventas set total_sin_iva = ?, iva = ?, total = ? where codigo = ?");
+				psActualizar.setBigDecimal(1, totalSinIva);
+				psActualizar.setBigDecimal(2, iva);
+				psActualizar.setBigDecimal(3, total);
+				psActualizar.setInt(4, ventas.getCodigo());
+				psActualizar.executeUpdate();
+				
+
+				psHis = con.prepareStatement("insert into historial_stock(fecha, referencia, producto, cantidad) " 
+						+ "values(?, ?, ?, ?)");
+				psHis.setTimestamp(1, fechaHoraActual);
+				psHis.setString(2, "venta " + ventas.getCodigo());
+				psHis.setInt(3, detventas.getProducto().getCodigo());
+				psHis.setInt(4, detventas.getCantidad());
+
+				psHis.executeUpdate();
+
+			}
+
+		} catch (KrakeException e) {
+			e.printStackTrace();
+			throw e;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KrakeException("error al ingresar un proveedor" + e.getMessage());
+		}
+
+	}
+
+}
